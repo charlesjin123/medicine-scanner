@@ -10,7 +10,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    expo install expo-av
    npm install axios
-   pip install flask transformers torch whisper gtts pyaudio
+   pip install flask transformers torch gTTS speechrecognition pydub
+   brew install ffmpeg
    ```
 
 2. Start the app
