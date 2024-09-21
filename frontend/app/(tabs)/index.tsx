@@ -3,27 +3,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
-import apiKeyData from '../../google-api-key.json';
 
 export default function HomeScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [ocrResult, setOcrResult] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const cameraRef = useRef(null);
-
-  useEffect(() => {
-    const loadApiKey = async () => {
-      try {
-        const apiKey = apiKeyData.api_key;
-        setApiKey(apiKey);
-      } catch (error) {
-        console.error('Error reading API key file:', error);
-      }
-    };
-
-    loadApiKey();
-  }, []);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -47,46 +32,15 @@ export default function HomeScreen() {
   const takePicture = async () => {
     console.log("taking picture");
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true });
-      const fileUri = FileSystem.documentDirectory + 'photo.jpg';
-      await FileSystem.writeAsStringAsync(fileUri, photo.base64, { encoding: FileSystem.EncodingType.Base64 });
-      console.log("Photo saved to:", fileUri);
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        console.log("File info:", fileInfo);
-
-        const ocrText = await performOcr(photo.base64);
-      setOcrResult(ocrText);
+      const photo = await cameraRef.current.takePictureAsync ({base64: true});
+      
+      console.log(photo.uri);
+      console.log(photo.base64);
+      
 
     }
   };
-  
-  const performOcr = async (base64Image) => {
-    try {
-      const response = await axios.post(
-        `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
-        {
-          requests: [
-            {
-              image: {
-                content: base64Image,
-              },
-              features: [
-                {
-                  type: 'TEXT_DETECTION',
-                },
-              ],
-            },
-          ],
-        }
-      );
 
-      const textAnnotations = response.data.responses[0].textAnnotations;
-      return textAnnotations.length > 0 ? textAnnotations[0].description : 'No text found';
-    } catch (error) {
-      console.error('Error performing OCR:', error);
-      return 'Error performing OCR';
-    }
-  };
 
   return (
     <View style={styles.container}>
