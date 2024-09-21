@@ -9,6 +9,12 @@ BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"  # BioBERT model 
 M4A_FILE_PATH = "input_audio.m4a"  # Path to your input M4A file
 WAV_FILE_PATH = "converted_audio.wav"  # Path to save the converted WAV file
 
+context_file = "contexts/medinfo.txt"
+
+def load_context_from_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
 # Function to convert M4A to WAV
 def convert_m4a_to_wav(m4a_file, wav_file):
     # Use ffmpeg to convert M4A to WAV
@@ -57,12 +63,7 @@ def main():
 
     # Get context from user input
     # print("Please enter the context for BioBERT:")
-    context = """
-    Aspirin is used to reduce fever and relieve mild to moderate pain from conditions such as muscle aches, toothaches, common cold, and headaches.
-    It may also be used to reduce pain and swelling in conditions such as arthritis. Aspirin is known as a salicylate and a nonsteroidal 
-    anti-inflammatory drug (NSAID). It works by blocking a certain natural substance in your body to reduce pain and swelling.
-    Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
-    """
+    context = load_context_from_file(context_file)
 
     # Load BioBERT pipeline for question-answering
     print("Processing with BioBERT...")
