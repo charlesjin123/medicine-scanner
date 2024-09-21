@@ -88,8 +88,7 @@ def process_image():
     if not data or 'file_path' not in data:
         return jsonify({'error': 'No file path provided'}), 400
 
-    #image_path = data['file_path']
-    image_path = 'images/test.png'
+    image_path = data['file_path']
 
     # Check if the image file exists
     if not os.path.exists(image_path):
