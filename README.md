@@ -8,9 +8,15 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
-   expo install expo-av
+   npm install expo
+   touch .expo/settings.json
+   add
+   {
+   "packageManager": "npm"
+   }
+   npx expo install expo-av --npm
    npm install axios
-   pip install flask transformers torch gTTS speechrecognition pydub
+   pip install flask flask-cors transformers torch gtts speechrecognition
    brew install ffmpeg
    ```
 
