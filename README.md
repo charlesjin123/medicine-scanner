@@ -8,6 +8,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
+   expo install expo-av
+   npm install axios
+   pip install flask transformers torch whisper gtts pyaudio
    ```
 
 2. Start the app
