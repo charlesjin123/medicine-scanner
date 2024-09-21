@@ -24,10 +24,23 @@ def convert_m4a_to_wav(m4a_file, wav_file):
     command = f'ffmpeg -y -i "{m4a_file}" -ar 16000 -ac 1 "{wav_file}"'
     subprocess.call(command, shell=True)
 
-# Function for Text-to-Speech (TTS) using gTTS
-def text_to_speech(text, file_name="response.mp3"):
+def amplify_audio(input_file, output_file, target):
+    # Use ffmpeg to amplify the audio by a specific multiplier
+    print("amplifying audio: ", input_file, output_file, target)
+    command = f'ffmpeg -i "{input_file}" -filter:a "volume={target}dB" "{output_file}"'
+
+    subprocess.call(command, shell=True)
+
+# In your text_to_speech function:
+def text_to_speech(text, file_name="response.wav"):
     tts = gTTS(text)
     tts.save(file_name)
+
+    # Amplify the audio after generating it
+    amplified_file_name = "amplified_" + file_name
+    amplify_audio(file_name, amplified_file_name, 75) 
+
+    return amplified_file_name
 
 # Function to transcribe audio using SpeechRecognition
 def transcribe_audio(audio_file):
@@ -60,6 +73,7 @@ def process_audio():
     unique_id = str(uuid.uuid4())
     m4a_filename = f"uploaded_{unique_id}.m4a"
     wav_filename = f"converted_{unique_id}.wav"
+    response_wav = f"response_{unique_id}.wav"
     response_audio_filename = f"response_{unique_id}.mp3"
 
     audio_file.save(m4a_filename)
@@ -92,7 +106,10 @@ def process_audio():
 
     # Convert BioBERT's answer to speech
     print("Converting answer to speech...")
-    text_to_speech(answer_text, response_audio_filename)
+    amplified = text_to_speech(answer_text, response_wav)
+
+    #convert wav to mp3
+    response_audio_filename = amplified
 
     # Return the text answer and URL to the audio response
     response = {

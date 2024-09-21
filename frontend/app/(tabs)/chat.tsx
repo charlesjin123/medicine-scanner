@@ -83,7 +83,7 @@ const Chat = () => {
 
       console.log('Sending audio to backend...');
 
-      const response = await axios.post('http://10.102.103.117:5000/process_audio', formData, {
+      const response = await axios.post('http://10.102.79.218:5000/process_audio', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -113,6 +113,7 @@ const Chat = () => {
   const playAudio = async (audioUri: string) => {
     try {
       const { sound } = await Audio.Sound.createAsync({ uri: audioUri });
+      await sound.setVolumeAsync(1.0);
       await sound.playAsync();
     } catch (error) {
       console.error('Error playing audio', error);
