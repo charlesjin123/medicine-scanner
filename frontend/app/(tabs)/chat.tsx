@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { Audio } from 'expo-av';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
@@ -83,7 +83,7 @@ const Chat = () => {
 
       console.log('Sending audio to backend...');
 
-      const response = await axios.post('http://10.102.79.218:5000/process_audio', formData, {
+      const response = await axios.post('http://10.102.103.117:5000/process_audio', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -98,6 +98,11 @@ const Chat = () => {
       ]);
 
       setIsProcessing(false);
+
+      // Automatically play the audio when it's received
+      if (audio_response_url) {
+        playAudio(audio_response_url);
+      }
     } catch (error) {
       console.error('Error sending audio to backend', error);
       setIsProcessing(false);

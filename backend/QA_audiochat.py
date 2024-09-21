@@ -3,7 +3,7 @@ import subprocess
 from transformers import pipeline  # For BioBERT model
 from gtts import gTTS  # For text-to-speech
 import speech_recognition as sr  # For transcription
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, url_for
 from flask_cors import CORS
 import uuid
 
@@ -97,7 +97,7 @@ def process_audio():
     # Return the text answer and URL to the audio response
     response = {
         'text_response': answer_text,
-        'audio_response_url': f"/get_audio/{response_audio_filename}"
+        'audio_response_url': url_for('get_audio', filename=response_audio_filename, _external=True)
     }
 
     # Clean up uploaded and intermediate files
