@@ -48,6 +48,7 @@ def transcribe_audio(audio_file):
 # Endpoint to process audio
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
+    print("hiiii")
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
