@@ -6,6 +6,9 @@ import speech_recognition as sr  # For transcription
 from flask import Flask, request, jsonify, send_file, url_for
 from flask_cors import CORS
 import uuid
+import pytesseract  # For OCR
+from PIL import Image  # For image processing
+import logging  # For logging
 
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
@@ -14,9 +17,16 @@ context_file = "contexts/medinfo.txt"
 app = Flask(__name__)
 CORS(app)  # Enable CORS to allow cross-origin requests
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
 def load_context_from_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
+
+def save_context_to_file(text, file_path):
+    with open(file_path, 'a') as file:  # 'a' mode to append text
+        file.write("\n" + text)
 
 # Function to convert M4A to WAV
 def convert_m4a_to_wav(m4a_file, wav_file):
@@ -26,12 +36,11 @@ def convert_m4a_to_wav(m4a_file, wav_file):
 
 def amplify_audio(input_file, output_file, target):
     # Use ffmpeg to amplify the audio by a specific multiplier
-    print("amplifying audio: ", input_file, output_file, target)
+    print("Amplifying audio: ", input_file, output_file, target)
     command = f'ffmpeg -i "{input_file}" -filter:a "volume={target}dB" "{output_file}"'
-
     subprocess.call(command, shell=True)
 
-# In your text_to_speech function:
+# Text-to-Speech function
 def text_to_speech(text, file_name="response.wav"):
     tts = gTTS(text)
     tts.save(file_name)
@@ -58,10 +67,50 @@ def transcribe_audio(audio_file):
             print(f"Could not request results from Speech Recognition service; {e}")
             return None
 
+# Function to perform OCR using Tesseract
+def ocr_tesseract(image_path):
+    logging.info(f"Starting OCR processing for {image_path}")
+    try:
+        image = Image.open(image_path)
+        text = pytesseract.image_to_string(image)
+        logging.info("Completed OCR processing")
+        return text
+    except Exception as e:
+        logging.error(f"Error occurred during OCR processing: {e}")
+        return None
+
+# Endpoint to process image and update context
+@app.route('/process_image', methods=['POST'])
+def process_image():
+    logging.info("Processing image for OCR...")
+    data = request.get_json()
+
+    if not data or 'file_path' not in data:
+        return jsonify({'error': 'No file path provided'}), 400
+
+    #image_path = data['file_path']
+    image_path = 'images/test.png'
+
+    # Check if the image file exists
+    if not os.path.exists(image_path):
+        return jsonify({'error': 'Image file not found'}), 404
+
+    # Perform OCR
+    ocr_text = ocr_tesseract(image_path)
+    if ocr_text is None:
+        return jsonify({'error': 'OCR processing failed'}), 500
+
+    # Append the new OCR text to the context file
+    save_context_to_file(ocr_text, context_file)
+
+    logging.info("OCR text appended to medinfo.txt")
+
+    return jsonify({'message': 'OCR processing successful and text added to medinfo.txt'}), 200
+
 # Endpoint to process audio
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
-    print("hiiii")
+    print("Processing audio...")
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
@@ -74,7 +123,6 @@ def process_audio():
     m4a_filename = f"uploaded_{unique_id}.m4a"
     wav_filename = f"converted_{unique_id}.wav"
     response_wav = f"response_{unique_id}.wav"
-    response_audio_filename = f"response_{unique_id}.mp3"
 
     audio_file.save(m4a_filename)
 
@@ -108,13 +156,10 @@ def process_audio():
     print("Converting answer to speech...")
     amplified = text_to_speech(answer_text, response_wav)
 
-    #convert wav to mp3
-    response_audio_filename = amplified
-
     # Return the text answer and URL to the audio response
     response = {
         'text_response': answer_text,
-        'audio_response_url': url_for('get_audio', filename=response_audio_filename, _external=True)
+        'audio_response_url': url_for('get_audio', filename=amplified, _external=True)
     }
 
     # Clean up uploaded and intermediate files
@@ -130,4 +175,3 @@ def get_audio(filename):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-
