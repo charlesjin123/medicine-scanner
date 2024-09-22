@@ -9,6 +9,8 @@ import uuid
 import pytesseract  # For OCR
 from PIL import Image  # For image processing
 import logging  # For logging
+import base64
+
 
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
@@ -84,20 +86,20 @@ def ocr_tesseract(image_path):
 def process_image():
     logging.info("Processing image for OCR...")
     data = request.get_json()
+    print("Processing image for OCR")
 
-    if not data or 'file_path' not in data:
-        return jsonify({'error': 'No file path provided'}), 400
+    base64_image = data['base64']
 
-    image_path = data['file_path']
-
-    # Check if the image file exists
-    if not os.path.exists(image_path):
-        return jsonify({'error': 'Image file not found'}), 404
+    image_name = "med_image.png"
+    with open(image_name, "wb") as med_image:
+        med_image.write(base64.decodebytes(bytes(base64_image, "utf-8")))
 
     # Perform OCR
-    ocr_text = ocr_tesseract(image_path)
+    ocr_text = ocr_tesseract(image_name)
     if ocr_text is None:
         return jsonify({'error': 'OCR processing failed'}), 500
+    
+    print("OCR text: ", ocr_text)
 
     # Append the new OCR text to the context file
     save_context_to_file(ocr_text, context_file)

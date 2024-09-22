@@ -34,9 +34,17 @@ export default function HomeScreen() {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync ({base64: true});
       
-      console.log(photo.uri);
-      console.log(photo.base64);
+      // console.log(photo.uri);
+      // console.log(photo.base64);
       
+      try {
+        const response = await axios.post('http://10.102.79.218:5000/process_image', {
+          base64: photo.base64
+        });
+        console.log('OCR Response:', response.data);
+      } catch (error) {
+        console.error('Error calling OCR API:', error);
+      }
 
     }
   };
