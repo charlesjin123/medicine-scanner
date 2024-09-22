@@ -1,7 +1,7 @@
-Medication, anti inflammatory drug
-Disease Treated, minor J 23 and pains
-How Often to Take, tablet
-How to Take, ses wmtemporarily
-Side Effects, reduces fever , BPE .
+Medication, sroidal anti inflammatory drug
+Disease Treated, pains due to e . dache m muscular aches ff or pain of arthritis
+How Often to Take, temporarily
+How to Take, tablet
+Side Effects, temporarily relieves minor 0 and pains
 
 -------------------------
