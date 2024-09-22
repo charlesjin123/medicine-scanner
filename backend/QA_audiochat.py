@@ -204,5 +204,19 @@ def process_audio():
 def get_audio(filename):
     return send_file(filename, mimetype='audio/mpeg')
 
+@app.route('/cards', methods=['GET'])
+def get_cards():
+    cards = []
+    try:
+        with open('cards.txt', 'r') as file:
+            for line in file:
+                if ',' in line:
+                    title, content = line.split(',', 1)
+                    cards.append({'title': title.strip(), 'content': content.strip()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    return jsonify(cards)
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
