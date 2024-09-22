@@ -12,7 +12,11 @@ import logging  # For logging
 import base64
 import cv2
 import re
-
+from cerebras.cloud.sdk import Cerebras
+from dotenv import load_dotenv, find_dotenv
+from pathlib import Path
+load_dotenv(Path("../.env"))
+# print(os.getenv("CEREBRAS_API_KEY"))
 
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
@@ -213,11 +217,32 @@ def process_audio():
     # Load BioBERT pipeline for question-answering
     print("Processing with BioBERT...")
     qa_pipeline = pipeline("question-answering", model=BIOBERT_MODEL_PATH)
+    
 
     # Ask BioBERT the question based on transcribed text
-    question = transcribed_text
-    answer = qa_pipeline(question=question, context=context)
-    answer_text = answer['answer']
+    # question = transcribed_text
+    # answer = qa_pipeline(question=question, context=context)
+    # answer_text = answer['answer']
+
+    client = Cerebras(
+        # This is the default and can be omitted
+        api_key=os.getenv("CEREBRAS_API_KEY"),
+    )
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "system": "You are an expert medical AI helper that is part of a medicine scanner app. You should help users with questions about medicine information they have scanned. Here is the information that the user has scanned: " + context,
+                "role": "user",
+                "content": transcribed_text,
+            }
+    ],
+        model="llama3.1-8b",
+        max_tokens=20,
+    )
+
+    answer_text = chat_completion.choices[0].message.content
+
     print(f"Answer: {answer_text}")
 
     # Convert BioBERT's answer to speech
