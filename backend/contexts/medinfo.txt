@@ -11,39 +11,3 @@ Aspirin is used to reduce fever and relieve mild to moderate pain from condition
 It may also be used to reduce pain and swelling in conditions such as arthritis. Aspirin is known as a salicylate and a nonsteroidal 
 anti-inflammatory drug (NSAID). It works by blocking a certain natural substance in your body to reduce pain and swelling.
 Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
-
-
-
-; { WAY 4
-. eo z
-. a tw 3
-CAMPUS B
-PRIDE
-
-e -
-EXPLORER re.
-V MEDICINE-SCANNER fF © a bac
-v backend ° 9
-Y contexts > 10
-= aspirin.txt il
-= coughsyrup.txt 12
-_ = ibuprofen.txt 4
-13
-> images 16
-¢) amplified_response_aa19f817-92a9-4f... 17
-¢) amplified_response_b7f7bda3-8bc7-4... 18
-ll imageToSave.png oe !
- med_image.png M 71 ;
-@ OCR.py 3) 22
-= output_text.txt
-‘ad preprocessed_image.png M
-@ QA_audio.py
-@ QA_audiochat.py 9
-@ QA_txt.py |
-¢) response_aal9f817-92a9-4fab-b2be-9... PROR
-nt’) response_b7f7bda3-8bc7-4e09-8048..
-VY frontend — | e INFO
-> .expo INFO
-Y app Breet
-VY (tabs) INFO:
-€ _layout.tsx . i INFO:
