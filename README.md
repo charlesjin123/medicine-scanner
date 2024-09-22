@@ -1,4 +1,14 @@
-# Welcome to your Expo app 👋
+# MedScanner - PennApps 2024
+
+Tools used:
+- Cerebras
+- Expo
+- OpenCV
+- React Native
+- Google Tesseract OCR
+- Flask
+- Llama3.1
+
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
