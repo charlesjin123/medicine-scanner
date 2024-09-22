@@ -11,6 +11,7 @@ from PIL import Image  # For image processing
 import logging  # For logging
 import base64
 import cv2
+import re
 
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
@@ -131,12 +132,47 @@ def process_image():
     
     print("OCR text: ", ocr_text)
 
-    # Append the new OCR text to the context file
-    save_context_to_file(ocr_text, context_file)
+    # Clean up the OCR text to ensure a standard format
+    cleaned_text = format_text(ocr_text)
+    
+    print("Cleaned OCR text: ", cleaned_text)
+
+    # Append the cleaned OCR text to the context file
+    save_context_to_file(cleaned_text, context_file)
 
     logging.info("OCR text appended to medinfo.txt")
 
     return jsonify({'message': 'OCR processing successful and text added to medinfo.txt'}), 200
+
+def format_text(text):
+    """Format and clean the OCR text to ensure readability."""
+    # Remove unnecessary characters
+    text = clean_unnecessary_characters(text)
+
+    # Strip leading/trailing whitespace
+    text = text.strip()
+    
+    # Replace multiple line breaks or empty lines with a single line break
+    paragraphs = [p.strip() for p in text.splitlines() if p.strip()]
+    
+    # Join paragraphs with two newlines (to represent a paragraph break)
+    formatted_text = "\n\n".join(paragraphs)
+    
+    # Ensure single spaces between sentences by collapsing any multiple spaces
+    formatted_text = " ".join(formatted_text.split())
+    
+    return formatted_text
+
+def clean_unnecessary_characters(text):
+    """Clean up unnecessary characters like special symbols and extra punctuation."""
+    # Remove non-alphabetic characters that aren't part of a sentence (like symbols and stray punctuation)
+    # Use a regex to remove unwanted characters (except common punctuation marks like . , ! ?)
+    text = re.sub(r'[^A-Za-z0-9.,!?\'"\s]+', ' ', text)
+    
+    # Replace multiple spaces with a single space
+    text = re.sub(r'\s+', ' ', text)
+    
+    return text
 
 # Endpoint to process audio
 @app.route('/process_audio', methods=['POST'])
