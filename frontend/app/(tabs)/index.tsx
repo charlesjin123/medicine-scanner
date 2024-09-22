@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function HomeScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -41,7 +42,11 @@ export default function HomeScreen() {
 
       try {
         const response = await axios.post(
+<<<<<<< HEAD
           "http://10.102.103.117:5000/process_image",
+=======
+          "http://10.102.79.218:5000/process_image",
+>>>>>>> 0a3edc7c71cf151fb2ff8a4da08757a6f0dbb594
           {
             base64: photo.base64,
           }
@@ -61,7 +66,11 @@ export default function HomeScreen() {
             <Text style={styles.text}>Flip Camera</Text>
           </TouchableOpacity> */}
           <TouchableOpacity style={styles.button} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture of Medicine</Text>
+            <Ionicons
+              name="radio-button-on-sharp"
+              size={85}
+              color="hsl(180, 0%, 76%)"
+            />
           </TouchableOpacity>
         </View>
       </CameraView>
