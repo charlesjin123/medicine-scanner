@@ -22,10 +22,6 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    npm install expo
    touch .expo/settings.json
-   add
-   {
-   "packageManager": "npm"
-   }
    npx expo install expo-av --npm
    npm install axios
    pip install flask flask-cors transformers torch gtts speechrecognition opencv-python cerebras_cloud_sdk
