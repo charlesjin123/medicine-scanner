@@ -1,13 +1,13 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState, useRef, useEffect } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import axios from 'axios';
+import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { useState, useRef, useEffect } from "react";
+import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import * as FileSystem from "expo-file-system";
+import axios from "axios";
 
 export default function HomeScreen() {
-  const [facing, setFacing] = useState<CameraType>('back');
+  const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  const [ocrResult, setOcrResult] = useState('');
+  const [ocrResult, setOcrResult] = useState("");
   const cameraRef = useRef(null);
 
   if (!permission) {
@@ -19,36 +19,39 @@ export default function HomeScreen() {
     // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Text style={styles.message}>
+          We need your permission to show the camera
+        </Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
   }
 
   function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+    setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
   const takePicture = async () => {
     console.log("taking picture");
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync ({base64: true});
-      
+      const photo = await cameraRef.current.takePictureAsync({ base64: true });
+
       // console.log(photo.uri);
       // console.log(photo.base64);
-      
-      try {
-        const response = await axios.post('http://10.102.79.218:5000/process_image', {
-          base64: photo.base64
-        });
-        console.log('OCR Response:', response.data);
-      } catch (error) {
-        console.error('Error calling OCR API:', error);
-      }
 
+      try {
+        const response = await axios.post(
+          "http://10.102.93.8:5000/process_image",
+          {
+            base64: photo.base64,
+          }
+        );
+        console.log("OCR Response:", response.data);
+      } catch (error) {
+        console.error("Error calling OCR API:", error);
+      }
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -69,10 +72,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   message: {
-    textAlign: 'center',
+    textAlign: "center",
     paddingBottom: 10,
   },
   camera: {
@@ -80,18 +83,18 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
+    flexDirection: "row",
+    backgroundColor: "transparent",
     margin: 64,
   },
   button: {
     flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
+    alignSelf: "flex-end",
+    alignItems: "center",
   },
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
 });

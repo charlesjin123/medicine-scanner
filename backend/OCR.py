@@ -2,34 +2,51 @@ import os
 import pytesseract
 from PIL import Image
 import logging
+import cv2
+import numpy as np
 
-# Set up logging
+
+def preprocess_image(image_path):
+    # Open the image using OpenCV
+    img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply median blur to reduce noise
+    gray = cv2.medianBlur(gray, 3)
+
+    # Apply thresholding
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # Save the preprocessed image
+    preprocessed_image_path = 'preprocessed_image.png'
+    cv2.imwrite(preprocessed_image_path, thresh)
+
+    return preprocessed_image_path
+
 logging.basicConfig(level=logging.INFO)
 
-def ocr_tesseract(image_path, output_txt_file):
-    """
-    Perform OCR on the image and save the extracted text to a text file.
-
-    Args:
-    - image_path: Path to the input image (PNG format)
-    - output_txt_file: Path to the output text file to store the extracted text
-    """
+def ocr_tesseract(image_path):
     logging.info(f"Starting OCR processing for {image_path}")
-    
     try:
-        image = Image.open(image_path)
-        text = pytesseract.image_to_string(image)
-        
-        # Write extracted text to output file
-        with open(output_txt_file, "w") as f:
-            f.write(text)
-        
-        logging.info(f"Completed OCR processing. Extracted text saved to {output_txt_file}")
-        print(f"OCR Completed. Text saved to {output_txt_file}")
+        # Preprocess the image
+        preprocessed_image_path = preprocess_image(image_path)
 
+        # Open the preprocessed image
+        image = Image.open(preprocessed_image_path)
+
+        # Configure Tesseract
+        custom_config = r'--oem 3 --psm 6'
+
+        # Perform OCR
+        text = pytesseract.image_to_string(image, config=custom_config, lang='eng')
+        logging.info("Completed OCR processing")
+        return text
     except Exception as e:
         logging.error(f"Error occurred during OCR processing: {e}")
-
+        return None
+    
 if __name__ == "__main__":
     # Example usage
     image_path = "test.png"  # Path to your input PNG image
