@@ -1,4 +1,5 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
 
 const Card: React.FC<{ title: string; content: string, backgroundColor: string }> = ({ title, content, backgroundColor }) => {
@@ -11,14 +12,24 @@ const Card: React.FC<{ title: string; content: string, backgroundColor: string }
 };
 
 const CardsScreen: React.FC = () => {
-    const cardsData = [
-        { title: 'Card 1', content: 'This is the content of card 1.' },
-        { title: 'Aspirin - 25mg', content: 'Drink a Full Glass of Water with Each Dose' },
-        { title: 'Card 3', content: 'This is the content of card 3.' },
-        // Add more cards as needed
-    ];
+
+    const [cardsData, setCardsData] = useState<{ title: string; content: string }[]>([]);
 
     const colors = ['#C4D6BD', '#F6D7DC', '#ACB8E8'];
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://10.102.79.218:5000/cards');
+                console.log("Cards data:", response.data);
+                setCardsData(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <View style={styles.container}>
