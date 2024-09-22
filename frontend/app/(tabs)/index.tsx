@@ -41,7 +41,7 @@ export default function HomeScreen() {
 
       try {
         const response = await axios.post(
-          "http://10.102.93.8:5000/process_image",
+          "http://10.102.103.117:5000/process_image",
           {
             base64: photo.base64,
           }
