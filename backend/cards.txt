@@ -1,7 +1,7 @@
-Medication, anti inflammatory drug
-Disease Treated, minor J 23 and pains
-How Often to Take, tablet
-How to Take, ses wmtemporarily
-Side Effects, reduces fever , BPE .
+Medication, Bonatazine hydrochloride 0.05%
+Disease Treated, Nasal congestion, sinus pressure, cold, hay fever, allergies.
+How Often to Take, 2-3 sprays/nostril, every 10-12 hours.
+How to Take, 2-3 sprays in each nostril, every 10-12 hours, not more than 2 doses in 24 hours.
+Side Effects, Temporary burning, stinging, sneezing, increased nasal discharge.
 
 -------------------------

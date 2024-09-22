@@ -65,7 +65,7 @@ def text_to_speech(text, file_name="response.wav"):
     tts = gTTS(text)
     tts.save(file_name)
     amplified_file_name = "amplified_" + file_name
-    amplify_audio(file_name, amplified_file_name, 75) 
+    amplify_audio(file_name, amplified_file_name, 20) 
 
     return amplified_file_name
 
@@ -133,10 +133,36 @@ def summarize_medical_info(text):
         "side_effects": "What are the side effects of the medication?"
     }
     for key, question in questions.items():
-        logging.info(f"Asking BioBERT: {question}")
-        answer = qa_pipeline(question=question, context=text)
-        logging.info(f"BioBERT answer: {answer['answer']}")
-        summary[key] = answer['answer']
+        # BIOBERT VERSION
+        # logging.info(f"Asking BioBERT: {question}")
+        # answer = qa_pipeline(question=question, context=text)
+        # logging.info(f"BioBERT answer: {answer['answer']}")
+        # summary[key] = answer['answer']
+
+        # CEREBRAS VERSION
+        client = Cerebras(
+            # This is the default and can be omitted
+            api_key=os.getenv("CEREBRAS_API_KEY"),
+        )
+
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert medical AI helper that is part of a medicine scanner app. You should help the user with summarizing the information they have scanned. You must be concise in your response. You must output in a short phrase. You cannot output full sentences. Here is the medical information they scanned: " + text,
+                },
+                {
+                    "role": "user",
+                    "content": question,
+                }
+        ],
+            model="llama3.1-70b",
+            max_tokens=50,
+        )
+
+        answer_text = chat_completion.choices[0].message.content
+        summary[key] = answer_text
+
     return summary
 
 # Image processing and cards update endpoint
@@ -204,6 +230,7 @@ def process_audio():
     # answer = qa_pipeline(question=question, context=context)
     # answer_text = answer['answer']
 
+    # CEREBRAS START
     client = Cerebras(
         # This is the default and can be omitted
         api_key=os.getenv("CEREBRAS_API_KEY"),
@@ -212,16 +239,20 @@ def process_audio():
     chat_completion = client.chat.completions.create(
         messages=[
             {
-                "system": "You are an expert medical AI helper that is part of a medicine scanner app. You should help users with questions about medicine information they have scanned. Here is the information that the user has scanned: " + context,
+                "role": "system",
+                "content": "You are an expert medical AI helper that is part of a medicine scanner app. You should help users with questions about medicine information they have scanned. Be concise with your answer. Answer in less than 5 sentences. Answer in full sentences. Do not format your output with asterisks. Do not output incomplete responses that will get cut off by the token limit. Here is the information that the user has scanned: " + context,
+            },
+            {
                 "role": "user",
                 "content": transcribed_text,
             }
     ],
-        model="llama3.1-8b",
-        max_tokens=20,
+        model="llama3.1-70b",
+        max_tokens=100,
     )
 
     answer_text = chat_completion.choices[0].message.content
+    # CEREBRAS END
 
     print(f"Answer: {answer_text}")
 
