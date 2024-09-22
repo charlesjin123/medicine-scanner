@@ -39,7 +39,7 @@ def load_context_from_file(file_path):
 
 def save_context_to_file(text, file_path):
     with open(file_path, 'a') as file:  # 'a' mode to append text
-        file.write("\n" + text)
+        file.write("\n" + text + "\n")
 
 def save_summary_to_cards_file(summary, file_path):
     """Overwrite and save summarized data to cards.txt."""
