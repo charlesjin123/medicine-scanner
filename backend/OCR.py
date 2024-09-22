@@ -32,7 +32,7 @@ def ocr_tesseract(image_path, output_txt_file):
 
 if __name__ == "__main__":
     # Example usage
-    image_path = "test.png"  # Path to your input PNG image
+    image_path = "images/test.png"  # Path to your input PNG image
     output_txt_file = "output_text.txt"  # Path to your output text file
 
     ocr_tesseract(image_path, output_txt_file)
