@@ -16,6 +16,7 @@ import re
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
 context_file = "contexts/medinfo.txt"
+cards_file = "cards.txt"  # File to save summarized information
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS to allow cross-origin requests
@@ -23,6 +24,10 @@ CORS(app)  # Enable CORS to allow cross-origin requests
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
+# Initialize BioBERT pipeline
+qa_pipeline = pipeline("question-answering", model=BIOBERT_MODEL_PATH)
+
+# Utility functions
 def load_context_from_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
@@ -31,30 +36,33 @@ def save_context_to_file(text, file_path):
     with open(file_path, 'a') as file:  # 'a' mode to append text
         file.write("\n" + text)
 
-# Function to convert M4A to WAV
+def save_summary_to_cards_file(summary, file_path):
+    """Overwrite and save summarized data to cards.txt."""
+    with open(file_path, 'w') as file:  # 'w' mode to overwrite the file each time
+        file.write(f"Medication, {summary['med_name']}\n")
+        file.write(f"Disease Treated, {summary['disease']}\n")
+        file.write(f"How Often to Take, {summary['how_often']}\n")
+        file.write(f"How to Take, {summary['how_to_take']}\n")
+        file.write(f"Side Effects, {summary['side_effects']}\n")
+        file.write("\n-------------------------\n")
+
+# Audio-related functionality
 def convert_m4a_to_wav(m4a_file, wav_file):
-    # Use ffmpeg to convert M4A to WAV
     command = f'ffmpeg -y -i "{m4a_file}" -ar 16000 -ac 1 "{wav_file}"'
     subprocess.call(command, shell=True)
 
 def amplify_audio(input_file, output_file, target):
-    # Use ffmpeg to amplify the audio by a specific multiplier
     print("Amplifying audio: ", input_file, output_file, target)
     command = f'ffmpeg -i "{input_file}" -filter:a "volume={target}dB" "{output_file}"'
     subprocess.call(command, shell=True)
 
-# Text-to-Speech function
 def text_to_speech(text, file_name="response.wav"):
     tts = gTTS(text)
     tts.save(file_name)
-
-    # Amplify the audio after generating it
     amplified_file_name = "amplified_" + file_name
-    amplify_audio(file_name, amplified_file_name, 75) 
-
+    amplify_audio(file_name, amplified_file_name, 75)
     return amplified_file_name
 
-# Function to transcribe audio using SpeechRecognition
 def transcribe_audio(audio_file):
     recognizer = sr.Recognizer()
     with sr.AudioFile(audio_file) as source:
@@ -70,111 +78,89 @@ def transcribe_audio(audio_file):
             print(f"Could not request results from Speech Recognition service; {e}")
             return None
 
-
+# OCR-related functionality
 def preprocess_image(image_path):
-    # Open the image using OpenCV
     img = cv2.imread(image_path, cv2.IMREAD_COLOR)
-
-    # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Apply median blur to reduce noise
     gray = cv2.medianBlur(gray, 3)
-
-    # Apply thresholding
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-    # Save the preprocessed image
     preprocessed_image_path = 'preprocessed_image.png'
     cv2.imwrite(preprocessed_image_path, thresh)
-
     return preprocessed_image_path
-
-logging.basicConfig(level=logging.INFO)
 
 def ocr_tesseract(image_path):
     logging.info(f"Starting OCR processing for {image_path}")
     try:
-        # Preprocess the image
         preprocessed_image_path = preprocess_image(image_path)
-
-        # Open the preprocessed image
         image = Image.open(preprocessed_image_path)
-
-        # Configure Tesseract
         custom_config = r'--oem 3 --psm 6'
-
-        # Perform OCR
         text = pytesseract.image_to_string(image, config=custom_config, lang='eng')
         logging.info("Completed OCR processing")
         return text
     except Exception as e:
-        logging.error(f"Error occurred during OCR processing: {e}")
+        logging.error(f"Error during OCR processing: {e}")
         return None
 
-# Endpoint to process image and update context
+# Text formatting
+def format_text(text):
+    text = clean_unnecessary_characters(text)
+    text = text.strip()
+    paragraphs = [p.strip() for p in text.splitlines() if p.strip()]
+    formatted_text = "\n\n".join(paragraphs)
+    formatted_text = " ".join(formatted_text.split())
+    return formatted_text
+
+def clean_unnecessary_characters(text):
+    text = re.sub(r'[^A-Za-z0-9.,!?\'"\s]+', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text
+
+# BioBERT summarization
+def summarize_medical_info(text):
+    """Summarizes medical information using BioBERT."""
+    summary = {}
+    questions = {
+        "med_name": "What is the medication?",
+        "disease": "What disease or symptoms does this medication treat?",
+        "how_often": "How often should the medication be taken?",
+        "how_to_take": "How do you take the medicine?",
+        "side_effects": "What are the side effects of the medication?"
+    }
+    for key, question in questions.items():
+        logging.info(f"Asking BioBERT: {question}")
+        answer = qa_pipeline(question=question, context=text)
+        logging.info(f"BioBERT answer: {answer['answer']}")
+        summary[key] = answer['answer']
+    return summary
+
+# Image processing and cards update endpoint
 @app.route('/process_image', methods=['POST'])
 def process_image():
     logging.info("Processing image for OCR...")
     data = request.get_json()
-    print("Processing image for OCR")
-
     base64_image = data['base64']
-
     image_name = "med_image.png"
     with open(image_name, "wb") as med_image:
         med_image.write(base64.decodebytes(bytes(base64_image, "utf-8")))
 
-    # Perform OCR
     ocr_text = ocr_tesseract(image_name)
     if ocr_text is None:
         return jsonify({'error': 'OCR processing failed'}), 500
-    
-    print("OCR text: ", ocr_text)
 
-    # Clean up the OCR text to ensure a standard format
     cleaned_text = format_text(ocr_text)
-    
-    print("Cleaned OCR text: ", cleaned_text)
-
-    # Append the cleaned OCR text to the context file
     save_context_to_file(cleaned_text, context_file)
 
     logging.info("OCR text appended to medinfo.txt")
 
-    return jsonify({'message': 'OCR processing successful and text added to medinfo.txt'}), 200
+    # BioBERT summarization
+    summary = summarize_medical_info(cleaned_text)
+    save_summary_to_cards_file(summary, cards_file)
 
-def format_text(text):
-    """Format and clean the OCR text to ensure readability."""
-    # Remove unnecessary characters
-    text = clean_unnecessary_characters(text)
+    logging.info(f"Summary added to {cards_file}")
 
-    # Strip leading/trailing whitespace
-    text = text.strip()
-    
-    # Replace multiple line breaks or empty lines with a single line break
-    paragraphs = [p.strip() for p in text.splitlines() if p.strip()]
-    
-    # Join paragraphs with two newlines (to represent a paragraph break)
-    formatted_text = "\n\n".join(paragraphs)
-    
-    # Ensure single spaces between sentences by collapsing any multiple spaces
-    formatted_text = " ".join(formatted_text.split())
-    
-    return formatted_text
+    return jsonify({'message': 'OCR processing successful and summary added to cards.txt', 'summary': summary}), 200
 
-def clean_unnecessary_characters(text):
-    """Clean up unnecessary characters like special symbols and extra punctuation."""
-    # Remove non-alphabetic characters that aren't part of a sentence (like symbols and stray punctuation)
-    # Use a regex to remove unwanted characters (except common punctuation marks like . , ! ?)
-    text = re.sub(r'[^A-Za-z0-9.,!?\'"\s]+', ' ', text)
-    
-    # Replace multiple spaces with a single space
-    text = re.sub(r'\s+', ' ', text)
-    
-    return text
-
-# Endpoint to process audio
+# Audio processing endpoint
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
     print("Processing audio...")
@@ -185,51 +171,38 @@ def process_audio():
     if audio_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    # Save the uploaded M4A audio file
     unique_id = str(uuid.uuid4())
     m4a_filename = f"uploaded_{unique_id}.m4a"
     wav_filename = f"converted_{unique_id}.wav"
     response_wav = f"response_{unique_id}.wav"
-
     audio_file.save(m4a_filename)
 
-    # Convert M4A to WAV
     print("Converting M4A to WAV...")
     convert_m4a_to_wav(m4a_filename, wav_filename)
 
-    # Transcribe the audio input using SpeechRecognition
     print("Transcribing audio...")
     transcribed_text = transcribe_audio(wav_filename)
     if transcribed_text is None:
-        # Clean up files
         os.remove(m4a_filename)
         os.remove(wav_filename)
         return jsonify({'error': 'Transcription failed'}), 500
 
-    # Load context from file
     context = load_context_from_file(context_file)
 
-    # Load BioBERT pipeline for question-answering
     print("Processing with BioBERT...")
-    qa_pipeline = pipeline("question-answering", model=BIOBERT_MODEL_PATH)
-
-    # Ask BioBERT the question based on transcribed text
     question = transcribed_text
     answer = qa_pipeline(question=question, context=context)
     answer_text = answer['answer']
     print(f"Answer: {answer_text}")
 
-    # Convert BioBERT's answer to speech
     print("Converting answer to speech...")
     amplified = text_to_speech(answer_text, response_wav)
 
-    # Return the text answer and URL to the audio response
     response = {
         'text_response': answer_text,
         'audio_response_url': url_for('get_audio', filename=amplified, _external=True)
     }
 
-    # Clean up uploaded and intermediate files
     os.remove(m4a_filename)
     os.remove(wav_filename)
 
@@ -240,11 +213,12 @@ def process_audio():
 def get_audio(filename):
     return send_file(filename, mimetype='audio/mpeg')
 
+# Endpoint to retrieve cards data
 @app.route('/cards', methods=['GET'])
 def get_cards():
     cards = []
     try:
-        with open('cards.txt', 'r') as file:
+        with open(cards_file, 'r') as file:
             for line in file:
                 if ',' in line:
                     title, content = line.split(',', 1)
