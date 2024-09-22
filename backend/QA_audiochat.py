@@ -13,6 +13,7 @@ import base64
 import cv2
 import re
 
+
 # Configuration
 BIOBERT_MODEL_PATH = "dmis-lab/biobert-large-cased-v1.1-squad"
 context_file = "contexts/medinfo.txt"
@@ -50,7 +51,7 @@ def text_to_speech(text, file_name="response.wav"):
 
     # Amplify the audio after generating it
     amplified_file_name = "amplified_" + file_name
-    amplify_audio(file_name, amplified_file_name, 75) 
+    amplify_audio(file_name, amplified_file_name, 20) 
 
     return amplified_file_name
 

@@ -19,16 +19,25 @@ export default function TabLayout() {
         options={{
           title: 'Camera',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={focused ? 'camera' : 'camera-outline'} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="cards"
         options={{
-          title: 'Cards',
+          title: 'Info',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={focused ? 'file-tray-full' : 'file-tray-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Chat',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={'chatbox'} color={color} />
           ),
         }}
       />
