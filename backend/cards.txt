@@ -1,7 +1,7 @@
-Medication, anti inflammatory drug
-Disease Treated, minor J 23 and pains
-How Often to Take, tablet
-How to Take, ses wmtemporarily
-Side Effects, reduces fever , BPE .
+Medication, Oxymetazoline nasal decongestant
+Disease Treated, Nasal congestion, sinus pressure.
+How Often to Take, 2-3 sprays/nostirl, every 10-12 hours
+How to Take, 2-3 sprays/nostril, every 10-12 hours
+Side Effects, Burning, stinging, sneezing, increased nasal discharge.
 
 -------------------------

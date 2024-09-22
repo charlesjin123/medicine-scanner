@@ -93,7 +93,7 @@ const Chat = () => {
 
       console.log("Sending audio to backend...");
 
-      const response = await axios.post('http://10.102.79.218:5000/process_audio', formData, {
+      const response = await axios.post('http://10.103.170.182:5000/process_audio', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
