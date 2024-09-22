@@ -62,8 +62,3 @@ on the label and avoid exceeding the recommended dose to prevent side effects li
 Bismuth subsalicylate is used to treat temporary discomforts of the stomach and gastrointestinal tract, such as diarrhea, heartburn, nausea, and upset stomach. It works by protecting the stomach lining
 and reducing inflammation. The medication is typically taken every 30 to 60 minutes as needed, but not exceeding the maximum recommended dose. Side effects may include a temporary darkening of the stool
 or tongue, which is harmless. If symptoms persist for more than two days, seek medical advice.
-
-
-=======
-Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
->>>>>>> ebfc40b394359ce8e00fc3a15b3a259ec0e42e8b
