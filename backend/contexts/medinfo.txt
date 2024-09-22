@@ -9,8 +9,7 @@ If you are treating a chronic condition such as arthritis, ask your doctor about
 
 Aspirin is used to reduce fever and relieve mild to moderate pain from conditions such as muscle aches, toothaches, common cold, and headaches.
 It may also be used to reduce pain and swelling in conditions such as arthritis. Aspirin is known as a salicylate and a nonsteroidal 
-anti-inflammatory drug (NSAID). It works by blocking a certain natural substance in your body to reduce pain and swelling.
-Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
+anti-inflammatory drug (NSAID). It works by blocking a certain natural substance in your body to reduce pain and swelling. Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
 
 Acetaminophen is used to relieve mild to moderate pain from headaches, menstrual periods, toothaches, backaches, osteoarthritis, or cold and flu aches and pains. 
 It is also effective in reducing fever. Acetaminophen works by blocking the production of certain chemicals in the brain that signal pain. It is important to follow 
@@ -65,3 +64,6 @@ and reducing inflammation. The medication is typically taken every 30 to 60 minu
 or tongue, which is harmless. If symptoms persist for more than two days, seek medical advice.
 
 
+=======
+Take 2 tablets every 4 to 6 hours, with a maximum of 8 tablets in a 24-hour period.
+>>>>>>> ebfc40b394359ce8e00fc3a15b3a259ec0e42e8b

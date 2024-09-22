@@ -16,7 +16,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    }
    npx expo install expo-av --npm
    npm install axios
-   pip install flask flask-cors transformers torch gtts speechrecognition
+   pip install flask flask-cors transformers torch gtts speechrecognition opencv-python
    brew install ffmpeg
    ```
 
