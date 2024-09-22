@@ -1,4 +1,4 @@
-# MedScanner - PennApps 2024
+# MedScanner - PennApps XXV 2024
 
 Tools used:
 - Cerebras
