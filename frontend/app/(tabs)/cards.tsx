@@ -20,7 +20,7 @@ const CardsScreen: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://10.102.79.218:5000/cards');
+                const response = await axios.get('http://10.102.103.117:5000/cards');
                 console.log("Cards data:", response.data);
                 setCardsData(response.data);
             } catch (error) {
