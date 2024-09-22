@@ -1,3 +1,7 @@
-Title 1, Content 1
-Title 2, Content 2
-Title 3, Content 3
+Medication, anti inflammatory drug
+Disease Treated, minor J 23 and pains
+How Often to Take, tablet
+How to Take, ses wmtemporarily
+Side Effects, reduces fever , BPE .
+
+-------------------------
