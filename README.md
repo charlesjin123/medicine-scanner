@@ -1,5 +1,7 @@
 # MedScanner - PennApps XXV 2024
 
+Team Members: Stan Chen, Charles Jin, Tony Tian, Hans Zhu
+
 Tools used:
 - Cerebras
 - Expo
