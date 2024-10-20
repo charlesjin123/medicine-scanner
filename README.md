@@ -2,7 +2,7 @@
 
 Team Members: Stan Chen, Charles Jin, Tony Tian, Hans Zhu
 
-Devpost link: [https://devpost.com/software/med-scanner](url)
+Devpost link: [https://devpost.com/software/med-scanner](https://devpost.com/software/med-scanner)
 
 Tools used:
 - Cerebras
